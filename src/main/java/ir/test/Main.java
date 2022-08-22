@@ -1,7 +1,7 @@
 package ir.test;
 
 import ir.test.dao.ConnectToMySql;
-import ir.test.dao.DataStore;
+//import ir.test.dao.DataStore;
 import ir.test.entity.Person;
 import ir.test.entity.Vacation;
 import ir.test.service.PersonService;
