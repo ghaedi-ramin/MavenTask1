@@ -17,6 +17,7 @@ public class Main {
 
         ConnectToMySql connectToMySql = new ConnectToMySql();
         connectToMySql.fetchToPersonList();
+        connectToMySql.fetchToVacationList();
 
         Scanner scanner = new Scanner(System.in);
         do {
@@ -30,8 +31,7 @@ public class Main {
             System.out.println("5. Creat vacation");
             System.out.println("6. Show all vacation");
             System.out.println("7. Change vacation state");
-            System.out.println("8. save in Mysql");
-            System.out.println("9. Exit");
+            System.out.println("8. Exit");
 
             int option = scanner.nextInt();
 
@@ -56,6 +56,8 @@ public class Main {
                 Person person = new Person(id,name,family);
                 PersonService personService = new PersonService();
                 personService.createPerson(person);
+
+                ConnectToMySql.savePersons();
 
             }
             else if (option == 3) {
@@ -127,6 +129,8 @@ public class Main {
                     VacationService vacationService = new VacationService();
                     vacationService.createVacation(vacation);
 //                    System.out.println("vacation added");
+                    ConnectToMySql.saveVacations();
+
                 }
 
                 catch (Exception e) {
@@ -164,18 +168,18 @@ public class Main {
                 vacationService.showAllVacation();
             }
 
+//            else if (option == 8){
+//
+//
+//                try {
+//                    connectToMySql.savePersons();
+//                    connectToMySql.saveVacations();
+//                } catch (SQLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+
             else if (option == 8){
-
-
-                try {
-                    connectToMySql.savePersons();
-                    connectToMySql.saveVacations();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            else if (option == 9){
 
                 System.exit(0);
             }

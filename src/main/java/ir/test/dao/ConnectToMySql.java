@@ -3,10 +3,11 @@ package ir.test.dao;
 import ir.test.entity.Person;
 import ir.test.entity.Vacation;
 import ir.test.service.PersonService;
+import ir.test.service.VacationService;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 public class ConnectToMySql {
     final static String url = "jdbc:mysql://localhost/task1";
@@ -27,7 +28,7 @@ public class ConnectToMySql {
             e.printStackTrace();
         }
 
-        String savePerson = "INSERT INTO tbl_person (person_id, person_name, person_family) Values (?,?,?)";
+        String savePerson = "INSERT IGNORE INTO tbl_person (person_id, person_name, person_family) Values (?,?,?)";
         preparedStatement = connection.prepareStatement(savePerson);
 
         for (Person p : personDao.findAll()) {
@@ -53,10 +54,12 @@ public class ConnectToMySql {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        String saveVacation = "INSERT INTO tbl_vacation ( vacation_request_date,person_id,vacation_period,vacation_state) Values (?,?,?,?)";
+        String saveVacation = "INSERT IGNORE INTO tbl_vacation ( vacation_request_date,person_id,vacation_period,vacation_state) Values (?,?,?,?)";
+
         preparedStatement = connection.prepareStatement(saveVacation);
 
-        for (Vacation v : vacationDao.findAll()) {
+        for (Vacation v : vacationDao.findAll())
+        {
 
             preparedStatement.setString(1,v.getDate().toString());
             preparedStatement.setInt(2,v.getPerson().getPersonId());
@@ -70,7 +73,7 @@ public class ConnectToMySql {
         preparedStatement.close();
         connection.close();
     }
-    public static  void fetchToPersonList() throws SQLException {
+    public void fetchToPersonList() throws SQLException {
 
 
         try {
@@ -86,11 +89,6 @@ public class ConnectToMySql {
 
         while (resultSet.next()){
 
-//            Object selectResulset = resultSet.getInt(1) + resultSet.getString(2) + resultSet.getString(3);
-//          List<Object> person = new ArrayList<Object>();
-//           person.add(selectResulset);
-//           DataStore.AddPerson((Person) person);
-
             Person person = new Person(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3));
             PersonService personService = new PersonService();
             personService.createPerson(person);
@@ -100,4 +98,49 @@ public class ConnectToMySql {
         statement.close();
         connection.close();
     }
+
+    public void fetchToVacationList() throws SQLException {
+
+
+        try {
+            connection = DriverManager.getConnection(url, userName, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String selectVacation = "select * from tbl_Vacation";
+
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(selectVacation);
+
+
+        while (resultSet.next()){
+
+           String r1 = resultSet.getString(1);
+            int r2 = resultSet.getInt(2);
+            int r3 = resultSet.getInt(3);
+            String r4 = resultSet.getString(4);
+
+            PersonService personService1 = new PersonService();
+            personService1.getNameFamily(r2);
+
+            Person person = personService1.getNameFamily(r2);
+
+            String name = null;
+            String family = null;
+            name = person.getName();
+            family = person.getLastName();
+
+            Person person1 = new Person(r2, name, family);
+
+          Vacation vacation = new Vacation(LocalDate.parse(r1),r3,person1, Vacation.VacationState.valueOf(r4));
+            VacationService vacationService = new VacationService();
+            vacationService.createVacation(vacation);
+
+        }
+        resultSet.close();
+        statement.close();
+        connection.close();
+    }
+
 }
