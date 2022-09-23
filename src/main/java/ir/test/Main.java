@@ -1,10 +1,9 @@
 package ir.test;
 
-import ir.test.dao.ConnectToMySql;
-//import ir.test.dao.DataStore;
 import ir.test.entity.Person;
 import ir.test.entity.Vacation;
 import ir.test.service.PersonService;
+import ir.test.service.StartUP;
 import ir.test.service.VacationService;
 
 import java.sql.SQLException;
@@ -15,9 +14,9 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
 
-        ConnectToMySql connectToMySql = new ConnectToMySql();
-        connectToMySql.fetchToPersonList();
-        connectToMySql.fetchToVacationList();
+
+        StartUP startUP = new StartUP();
+        startUP.startupSystem();
 
         Scanner scanner = new Scanner(System.in);
         do {
@@ -57,8 +56,6 @@ public class Main {
                 PersonService personService = new PersonService();
                 personService.createPerson(person);
 
-                ConnectToMySql.savePersons();
-
             }
             else if (option == 3) {
 
@@ -78,8 +75,7 @@ public class Main {
                 System.out.println(" 2 : search by family");
                 int searchOption = scanner.nextInt();
 
-                PersonService personService
-                        = new PersonService();
+                PersonService personService = new PersonService();
 
                     if( searchOption == 1 ) {
                         System.out.println(" please enter personId :");
@@ -94,24 +90,19 @@ public class Main {
 
                         personService.searchPersonByFamily(searchFamily);
                     }
+                    else
+                        System.out.println("please enter true value");
             }
 
             else if (option == 5) {
 
-                System.out.println("enter id : ");
+                System.out.println("enter person_id : ");
                 int id = scanner.nextInt();
-                String name = null;
-                String family = null;
 
                 try {
-                    PersonService personService1 = new PersonService();
-                    personService1.getNameFamily(id);
 
-                    Person person = personService1.getNameFamily(id);
-                    name = person.getName();
-                    family = person.getLastName();
+                    Person person = new Person(id);
 
-                    Person person1 = new Person(id, name, family);
                     Vacation.VacationState vacationState = Vacation.VacationState.UNCHECK;
 
                     System.out.println("enter duration : ");
@@ -125,16 +116,16 @@ public class Main {
 
                     LocalDate localDate = LocalDate.of(year, month, day);
 
-                    Vacation vacation = new Vacation(localDate, duration, person1 , vacationState);
+                    Vacation vacation = new Vacation(localDate, duration, person , vacationState);
+
                     VacationService vacationService = new VacationService();
                     vacationService.createVacation(vacation);
-//                    System.out.println("vacation added");
-                    ConnectToMySql.saveVacations();
 
                 }
 
                 catch (Exception e) {
                     System.out.println("no id found");
+
                 }
             }
 
@@ -148,19 +139,16 @@ public class Main {
                 VacationService vacationService = new VacationService();
                 vacationService.showAllVacation();
 
-                System.out.println("\nplease select which record change the state");
-                int recordNumber = scanner.nextInt();
+                System.out.println("\nplease select which line change the state");
+                int line = scanner.nextInt();
                 System.out.println("for Confirmed the Vacation State press : 1 \n" +
                         "for Unconfirmed the Vacation State press : 2");
 
                 int changeState = scanner.nextInt();
-                if (changeState == 1) {
-                    vacationService.confirmVacationState(recordNumber);
-                }
-                else if (changeState == 2) {
 
-                    vacationService.unConfirmVacationState(recordNumber);
-                }
+                if (changeState == 1 || changeState == 2)
+                    vacationService.changeVacationState(line,changeState);
+
                 else
                     System.out.println("please enter correct value");
 
@@ -168,16 +156,6 @@ public class Main {
                 vacationService.showAllVacation();
             }
 
-//            else if (option == 8){
-//
-//
-//                try {
-//                    connectToMySql.savePersons();
-//                    connectToMySql.saveVacations();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
 
             else if (option == 8){
 
